@@ -1,0 +1,41 @@
+[
+  {
+    "epoch": 1,
+    "loss": 2.086494829343713,
+    "accuracy": 22.148,
+    "epoch_time": 80.62077760696411,
+    "total_elapsed": 80.62077760696411,
+    "global_batch": 391,
+    "gossip_count": 391,
+    "bytes_sent": 1831646497,
+    "bytes_recv": 1831644937,
+    "total_bytes": 3663291434,
+    "throughput_samples_per_sec": 310.0937592276519
+  },
+  {
+    "epoch": 2,
+    "loss": 1.658695740468057,
+    "accuracy": 39.084,
+    "epoch_time": 94.84946799278259,
+    "total_elapsed": 175.4702455997467,
+    "global_batch": 782,
+    "gossip_count": 782,
+    "bytes_sent": 3665638253,
+    "bytes_recv": 3665635129,
+    "total_bytes": 7331273382,
+    "throughput_samples_per_sec": 263.57554268941533
+  },
+  {
+    "epoch": 3,
+    "loss": 1.4311392694483023,
+    "accuracy": 48.168,
+    "epoch_time": 82.54136490821838,
+    "total_elapsed": 258.0116105079651,
+    "global_batch": 1173,
+    "gossip_count": 1173,
+    "bytes_sent": 5501975268,
+    "bytes_recv": 5501970576,
+    "total_bytes": 11003945844,
+    "throughput_samples_per_sec": 302.8784419520888
+  }
+]

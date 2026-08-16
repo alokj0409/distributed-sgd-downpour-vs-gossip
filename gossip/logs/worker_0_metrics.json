@@ -1,0 +1,47 @@
+[
+  {
+    "epoch": 1,
+    "loss": 2.091346217543268,
+    "accuracy": 22.032,
+    "epoch_time": 49.270918130874634,
+    "total_elapsed": 49.270918130874634,
+    "global_batch": 391,
+    "gossip_count": 391
+  },
+  {
+    "epoch": 2,
+    "loss": 1.6420959435460512,
+    "accuracy": 39.94,
+    "epoch_time": 51.29427433013916,
+    "total_elapsed": 100.5651924610138,
+    "global_batch": 782,
+    "gossip_count": 782
+  },
+  {
+    "epoch": 3,
+    "loss": 1.4179207049977138,
+    "accuracy": 48.608,
+    "epoch_time": 53.847315073013306,
+    "total_elapsed": 154.4125075340271,
+    "global_batch": 1173,
+    "gossip_count": 1173
+  },
+  {
+    "epoch": 4,
+    "loss": 1.2555602374284163,
+    "accuracy": 54.476,
+    "epoch_time": 54.20049166679382,
+    "total_elapsed": 208.61299920082092,
+    "global_batch": 1564,
+    "gossip_count": 1564
+  },
+  {
+    "epoch": 5,
+    "loss": 1.1307792123931144,
+    "accuracy": 59.576,
+    "epoch_time": 54.4701988697052,
+    "total_elapsed": 263.0831980705261,
+    "global_batch": 1955,
+    "gossip_count": 1955
+  }
+]

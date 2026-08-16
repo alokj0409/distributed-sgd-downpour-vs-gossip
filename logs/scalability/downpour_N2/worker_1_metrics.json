@@ -1,0 +1,26 @@
+[
+  {
+    "epoch": 1,
+    "loss": 1.9458541046932836,
+    "accuracy": 32.292,
+    "epoch_time": 51.58884859085083,
+    "total_elapsed": 51.58884859085083,
+    "global_batch": 391,
+    "bytes_sent": 916996269,
+    "bytes_recv": 917008662,
+    "total_bytes": 1834004931,
+    "throughput_samples_per_sec": 484.60085237168283
+  },
+  {
+    "epoch": 2,
+    "loss": 1.5406993276932661,
+    "accuracy": 43.66,
+    "epoch_time": 56.71975827217102,
+    "total_elapsed": 108.30860686302185,
+    "global_batch": 782,
+    "bytes_sent": 1833992538,
+    "bytes_recv": 1834017724,
+    "total_bytes": 3668010262,
+    "throughput_samples_per_sec": 440.7635145417395
+  }
+]

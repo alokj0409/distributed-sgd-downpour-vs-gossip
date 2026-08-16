@@ -1,0 +1,30 @@
+services:
+  worker-0:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python /app/gossip/gossip_worker.py --worker-id 0 --num-workers 2 --base-port 50060 --peers worker-1:50061 --data-dir /app/gossip/data --log-dir /app/gossip/logs
+    ports:
+      - "50060:50060"
+    volumes:
+      - ./gossip/logs:/app/gossip/logs
+      - ./gossip/data:/app/gossip/data
+    networks:
+      - gossip-net
+
+  worker-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python /app/gossip/gossip_worker.py --worker-id 1 --num-workers 2 --base-port 50060 --peers worker-0:50060 --data-dir /app/gossip/data --log-dir /app/gossip/logs
+    ports:
+      - "50061:50061"
+    volumes:
+      - ./gossip/logs:/app/gossip/logs
+      - ./gossip/data:/app/gossip/data
+    networks:
+      - gossip-net
+
+networks:
+  gossip-net:
+    driver: bridge

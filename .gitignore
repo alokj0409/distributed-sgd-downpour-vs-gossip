@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+downpour/venv/
+python312/
+
+# Installers & Large Executables
+*.exe
+Docker Desktop Installer.exe
+python-3.12.10-amd64.exe
+
+# Datasets & PyTorch Weights
+data/
+downpour/data/
+gossip/data/
+*.pt
+*.pth
+*.bin
+cifar-10-batches-py/
+cifar-10-python.tar.gz
+
+# Logs & Temporary Task Logs
+.system_generated/
+*.log
+
+# IDE & System
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

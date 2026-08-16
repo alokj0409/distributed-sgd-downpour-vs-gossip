@@ -1,0 +1,35 @@
+[
+  {
+    "epoch": 1,
+    "loss": 2.2670122681906397,
+    "accuracy": 15.60475161987041,
+    "epoch_time": 41.79305458068848,
+    "total_elapsed": 41.79305458068848,
+    "gossip_count": 261,
+    "active_peers": 2,
+    "total_bytes": 2485972968,
+    "throughput_samples_per_sec": 398.82224851068594
+  },
+  {
+    "epoch": 2,
+    "loss": 1.9433291625245777,
+    "accuracy": 28.521718262538997,
+    "epoch_time": 35.38318133354187,
+    "total_elapsed": 77.17623591423035,
+    "gossip_count": 521,
+    "active_peers": 1,
+    "total_bytes": 5014160016,
+    "throughput_samples_per_sec": 471.0712652680382
+  },
+  {
+    "epoch": 3,
+    "loss": 1.7369670520797087,
+    "accuracy": 36.45308375329974,
+    "epoch_time": 50.13851857185364,
+    "total_elapsed": 127.31475448608398,
+    "gossip_count": 762,
+    "active_peers": 0,
+    "total_bytes": 7274987764,
+    "throughput_samples_per_sec": 332.43902043322333
+  }
+]

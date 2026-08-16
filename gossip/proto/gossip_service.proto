@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package gossip;
+
+// Metadata for a single tensor
+message TensorMeta {
+    string name = 1;          // Parameter name (e.g., "conv1.weight")
+    repeated int32 shape = 2; // Shape dimensions
+}
+
+// A single tensor's data
+message TensorData {
+    TensorMeta meta = 1;
+    bytes data = 2;           // Raw float32 bytes
+}
+
+// Request to exchange weights with a peer
+message WeightExchangeRequest {
+    int32 sender_id = 1;              // ID of the worker initiating the exchange
+    repeated TensorData weights = 2;  // Sender's current model weights
+}
+
+// Response containing the peer's weights (before averaging)
+message WeightExchangeResponse {
+    int32 responder_id = 1;
+    repeated TensorData weights = 2;  // Responder's current model weights
+    bool success = 3;
+}
+
+// Simple health check
+message PingRequest {
+    int32 sender_id = 1;
+}
+
+message PingResponse {
+    int32 responder_id = 1;
+    bool ready = 2;
+}
+
+// The Gossip peer service — each worker runs this
+service GossipPeer {
+    // Exchange weights: sender sends its weights, receiver responds with its own.
+    // Both sides then average to (W_sender + W_receiver) / 2.
+    rpc ExchangeWeights(WeightExchangeRequest) returns (WeightExchangeResponse);
+
+    // Health check to verify peer is ready
+    rpc Ping(PingRequest) returns (PingResponse);
+}

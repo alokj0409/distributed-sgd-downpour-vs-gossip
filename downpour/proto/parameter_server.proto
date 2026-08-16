@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package downpour;
+
+// Metadata for a single tensor
+message TensorMeta {
+    string name = 1;          // Parameter name (e.g., "conv1.weight")
+    repeated int32 shape = 2; // Shape dimensions
+}
+
+// A single tensor's data
+message TensorData {
+    TensorMeta meta = 1;
+    bytes data = 2;           // Raw float32 bytes
+}
+
+// Worker pushes gradients to the server
+message GradientUpdate {
+    int32 worker_id = 1;
+    repeated TensorData gradients = 2;
+}
+
+// Server response after applying gradients
+message PushResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+// Worker requests latest weights
+message PullRequest {
+    int32 worker_id = 1;
+}
+
+// Server returns current global model weights
+message ModelWeights {
+    repeated TensorData weights = 1;
+    int64 global_step = 2;    // How many gradient updates have been applied
+}
+
+// The Parameter Server service
+service ParameterServer {
+    // Worker pushes locally computed gradients to the server
+    rpc PushGradients(GradientUpdate) returns (PushResponse);
+
+    // Worker pulls the latest global model weights from the server
+    rpc PullWeights(PullRequest) returns (ModelWeights);
+}

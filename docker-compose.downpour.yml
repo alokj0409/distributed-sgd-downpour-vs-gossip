@@ -1,0 +1,43 @@
+services:
+  parameter-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python /app/downpour/server.py --port 50051
+    ports:
+      - "50051:50051"
+    volumes:
+      - ./downpour/logs:/app/downpour/logs
+      - ./downpour/data:/app/downpour/data
+    networks:
+      - downpour-net
+
+  worker-0:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python /app/downpour/worker.py --worker-id 0 --server-address parameter-server:50051 --num-workers 2 --data-dir /app/downpour/data --log-dir /app/downpour/logs
+    depends_on:
+      - parameter-server
+    volumes:
+      - ./downpour/logs:/app/downpour/logs
+      - ./downpour/data:/app/downpour/data
+    networks:
+      - downpour-net
+
+  worker-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python /app/downpour/worker.py --worker-id 1 --server-address parameter-server:50051 --num-workers 2 --data-dir /app/downpour/data --log-dir /app/downpour/logs
+    depends_on:
+      - parameter-server
+    volumes:
+      - ./downpour/logs:/app/downpour/logs
+      - ./downpour/data:/app/downpour/data
+    networks:
+      - downpour-net
+
+networks:
+  downpour-net:
+    driver: bridge
