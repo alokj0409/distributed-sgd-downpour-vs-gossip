@@ -1,0 +1,146 @@
+{
+  "latency_sweeps": [
+    {
+      "system": "Downpour",
+      "latency_ms": 0,
+      "bandwidth_mbps": 0,
+      "wall_clock_time": 61.43122100830078,
+      "accuracy": 34.06,
+      "loss": 1.850614250468476,
+      "total_bytes": 1834003367,
+      "throughput": 460.90219718547934
+    },
+    {
+      "system": "Gossip",
+      "latency_ms": 0,
+      "bandwidth_mbps": 0,
+      "wall_clock_time": 56.76153802871704,
+      "accuracy": 22.832,
+      "loss": 2.092453288300263,
+      "total_bytes": 3667981948,
+      "throughput": 474.2392786578589
+    },
+    {
+      "system": "Downpour",
+      "latency_ms": 20,
+      "bandwidth_mbps": 0,
+      "wall_clock_time": 87.34352421760559,
+      "accuracy": 33.368,
+      "loss": 1.856888112509647,
+      "total_bytes": 1834003365,
+      "throughput": 310.75777564142476
+    },
+    {
+      "system": "Gossip",
+      "latency_ms": 20,
+      "bandwidth_mbps": 0,
+      "wall_clock_time": 77.51174569129944,
+      "accuracy": 23.048,
+      "loss": 2.06073242959464,
+      "total_bytes": 3658600920,
+      "throughput": 353.8342059902526
+    },
+    {
+      "system": "Downpour",
+      "latency_ms": 50,
+      "bandwidth_mbps": 0,
+      "wall_clock_time": 134.64343357086182,
+      "accuracy": 32.988,
+      "loss": 1.9782812442925886,
+      "total_bytes": 1834003367,
+      "throughput": 196.1544952205263
+    },
+    {
+      "system": "Gossip",
+      "latency_ms": 50,
+      "bandwidth_mbps": 0,
+      "wall_clock_time": 96.19739723205566,
+      "accuracy": 21.62,
+      "loss": 2.095239506962964,
+      "total_bytes": 3667981948,
+      "throughput": 272.2336762805856
+    },
+    {
+      "system": "Downpour",
+      "latency_ms": 100,
+      "bandwidth_mbps": 0,
+      "wall_clock_time": 205.11259269714355,
+      "accuracy": 33.924,
+      "loss": 1.8069559329610956,
+      "total_bytes": 1834003367,
+      "throughput": 126.28908703133179
+    },
+    {
+      "system": "Gossip",
+      "latency_ms": 100,
+      "bandwidth_mbps": 0,
+      "wall_clock_time": 132.16556644439697,
+      "accuracy": 22.04,
+      "loss": 2.091329424582479,
+      "total_bytes": 3658600920,
+      "throughput": 200.32074940183085
+    }
+  ],
+  "bandwidth_sweeps": [
+    {
+      "system": "Downpour",
+      "latency_ms": 0,
+      "bandwidth_mbps": 0,
+      "wall_clock_time": 62.17718458175659,
+      "accuracy": 32.544,
+      "loss": 1.9452184929567224,
+      "total_bytes": 1834003367,
+      "throughput": 454.3492478800955
+    },
+    {
+      "system": "Gossip",
+      "latency_ms": 0,
+      "bandwidth_mbps": 0,
+      "wall_clock_time": 63.28322196006775,
+      "accuracy": 22.732,
+      "loss": 2.077287228211113,
+      "total_bytes": 3653910406,
+      "throughput": 423.44614131848647
+    },
+    {
+      "system": "Downpour",
+      "latency_ms": 0,
+      "bandwidth_mbps": 250,
+      "wall_clock_time": 87.18926119804382,
+      "accuracy": 33.896,
+      "loss": 1.834916229138289,
+      "total_bytes": 1834003365,
+      "throughput": 312.3365211073875
+    },
+    {
+      "system": "Gossip",
+      "latency_ms": 0,
+      "bandwidth_mbps": 250,
+      "wall_clock_time": 86.25499868392944,
+      "accuracy": 22.272,
+      "loss": 2.087220613608885,
+      "total_bytes": 3667981948,
+      "throughput": 304.8182351476626
+    },
+    {
+      "system": "Downpour",
+      "latency_ms": 0,
+      "bandwidth_mbps": 100,
+      "wall_clock_time": 127.68382406234741,
+      "accuracy": 32.12,
+      "loss": 1.863352555143254,
+      "total_bytes": 1834003367,
+      "throughput": 207.45965506362074
+    },
+    {
+      "system": "Gossip",
+      "latency_ms": 0,
+      "bandwidth_mbps": 100,
+      "wall_clock_time": 132.09393525123596,
+      "accuracy": 22.32,
+      "loss": 2.077582800174918,
+      "total_bytes": 3667981948,
+      "throughput": 195.7390698605874
+    }
+  ]
+}

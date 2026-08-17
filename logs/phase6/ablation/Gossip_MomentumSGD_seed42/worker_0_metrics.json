@@ -1,0 +1,15 @@
+[
+  {
+    "epoch": 1,
+    "loss": 2.0894417342017677,
+    "accuracy": 22.064,
+    "epoch_time": 56.530118465423584,
+    "total_elapsed": 56.530118465423584,
+    "global_batch": 391,
+    "gossip_count": 390,
+    "bytes_sent": 1831644937,
+    "bytes_recv": 1831646497,
+    "total_bytes": 3663291434,
+    "throughput_samples_per_sec": 442.2421300123605
+  }
+]

@@ -1,0 +1,98 @@
+{
+  "summary": {
+    "Downpour_MomentumSGD": {
+      "system": "Downpour",
+      "optimizer": "sgd",
+      "momentum": 0.9,
+      "mean_accuracy": 32.092,
+      "std_accuracy": 0.0,
+      "mean_loss": 1.8420943082750911,
+      "std_loss": 0.0,
+      "mean_time": 79.00695395469666,
+      "std_time": 0.0,
+      "seeds_count": 1
+    },
+    "Downpour_Adagrad": {
+      "system": "Downpour",
+      "optimizer": "adagrad",
+      "momentum": 0.0,
+      "mean_accuracy": 33.236,
+      "std_accuracy": 0.0,
+      "mean_loss": 1.9637794650119285,
+      "std_loss": 0.0,
+      "mean_time": 65.85348320007324,
+      "std_time": 0.0,
+      "seeds_count": 1
+    },
+    "Gossip_MomentumSGD": {
+      "system": "Gossip",
+      "optimizer": "sgd",
+      "momentum": 0.9,
+      "mean_accuracy": 22.064,
+      "std_accuracy": 0.0,
+      "mean_loss": 2.0894417342017677,
+      "std_loss": 0.0,
+      "mean_time": 60.86210036277771,
+      "std_time": 0.0,
+      "seeds_count": 1
+    },
+    "Gossip_VanillaSGD": {
+      "system": "Gossip",
+      "optimizer": "sgd",
+      "momentum": 0.0,
+      "mean_accuracy": 23.12,
+      "std_accuracy": 0.0,
+      "mean_loss": 2.0675143857136407,
+      "std_loss": 0.0,
+      "mean_time": 60.6451632976532,
+      "std_time": 0.0,
+      "seeds_count": 1
+    }
+  },
+  "raw": [
+    {
+      "config_name": "Downpour_MomentumSGD",
+      "system": "Downpour",
+      "optimizer": "sgd",
+      "momentum": 0.9,
+      "seed": 42,
+      "wall_clock_time": 79.00695395469666,
+      "accuracy": 32.092,
+      "loss": 1.8420943082750911,
+      "total_bytes": 1834003364
+    },
+    {
+      "config_name": "Downpour_Adagrad",
+      "system": "Downpour",
+      "optimizer": "adagrad",
+      "momentum": 0.0,
+      "seed": 42,
+      "wall_clock_time": 65.85348320007324,
+      "accuracy": 33.236,
+      "loss": 1.9637794650119285,
+      "total_bytes": 1834003364
+    },
+    {
+      "config_name": "Gossip_MomentumSGD",
+      "system": "Gossip",
+      "optimizer": "sgd",
+      "momentum": 0.9,
+      "seed": 42,
+      "wall_clock_time": 60.86210036277771,
+      "accuracy": 22.064,
+      "loss": 2.0894417342017677,
+      "total_bytes": 3663291434
+    },
+    {
+      "config_name": "Gossip_VanillaSGD",
+      "system": "Gossip",
+      "optimizer": "sgd",
+      "momentum": 0.0,
+      "seed": 42,
+      "wall_clock_time": 60.6451632976532,
+      "accuracy": 23.12,
+      "loss": 2.0675143857136407,
+      "total_bytes": 3644529378
+    }
+  ]
+}
