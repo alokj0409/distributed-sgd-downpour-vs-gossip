@@ -1,5 +1,5 @@
 %% ================================================================
-%% IEEE Conference Paper — paper.tex (Master 6+ Page Submission)
+%% IEEE Conference Paper — paper.tex (Clean 6-Page Submission)
 %% Title: Centralized vs. Decentralized Distributed Training:
 %%        A Head-to-Head Empirical Comparison of Downpour SGD and Gossip SGD
 %% ================================================================
@@ -39,7 +39,7 @@ and Gossip SGD}
 %  ABSTRACT
 % ================================================================
 \begin{abstract}
-Distributed Stochastic Gradient Descent (SGD) is foundational to large-scale deep learning. Two dominant paradigms exist: the \emph{centralized Parameter Server} (PS) approach, exemplified by Downpour SGD, and \emph{decentralized peer-to-peer} weight averaging, exemplified by Gossip SGD. Despite theoretical maturity, rigorous empirical comparisons under identical network constraints, bandwidth caps, and exchange frequencies remain sparse. This paper presents a complete head-to-head empirical study implemented from scratch using PyTorch~2.13, gRPC~1.83, and Protocol Buffers in a Docker-based multi-process simulation environment on an Intel Core i5-12450H workstation (16\,GB RAM, CPU-only). Both systems train a four-layer Convolutional Neural Network (CNN, 586,250 parameters) on CIFAR-10 across five experimental dimensions: baseline convergence quality, software network latency simulation ($0\to 100$\,ms), bandwidth throttling ($100$\,Mbps), gossip exchange interval sweeps ($\text{gossip\_every} \in \{1,5,10\}$), worker scalability ($N \in \{2,4\}$), peak single-node bandwidth strain, and live fault-injection resilience.
+Distributed Stochastic Gradient Descent (SGD) is foundational to large-scale deep learning. Two dominant paradigms exist: the \emph{centralized Parameter Server} (PS) approach, exemplified by Downpour SGD, and \emph{decentralized peer-to-peer} weight averaging, exemplified by Gossip SGD. Despite theoretical maturity, rigorous empirical comparisons under controlled network latency, bandwidth caps, and exchange frequencies remain sparse. This paper presents a complete head-to-head empirical study implemented from scratch using PyTorch~2.13, gRPC~1.83, and Protocol Buffers in a Docker-based multi-process simulation environment on an Intel Core i5-12450H workstation (16\,GB RAM, CPU-only). Both systems train a four-layer Convolutional Neural Network (CNN, 586,250 parameters) on CIFAR-10 across five experimental dimensions: baseline convergence quality, software network latency simulation ($0\to 100$\,ms), bandwidth throttling ($100$\,Mbps), gossip exchange interval sweeps ($\text{gossip\_every} \in \{1,5,10\}$), worker scalability ($N \in \{2,4\}$), peak single-node bandwidth strain, and live fault-injection resilience.
 
 Key empirical findings: (1)~Downpour SGD completes baseline three-epoch training in $166.98$\,s versus $258.01$\,s for Gossip SGD ($1.54\times$ faster) and generates half the baseline payload ($11.0$\,GB vs.\ $22.0$\,GB). (2)~Under an artificial $100$\,Mbps network bandwidth cap, Decentralized Gossip SGD outpaces Centralized Downpour SGD by $15.45$\,s ($159.69$\,s vs.\ $175.14$\,s) due to Parameter Server NIC bottlenecking ($N\times\text{payload}$). (3)~Optimizing gossip exchange frequency ($\text{gossip\_every}=5$) yields a $1.72\times$ wall-clock speedup ($80.29$\,s vs.\ $46.57$\,s) and a $5\times$ payload reduction ($7.32$\,GB to $1.46$\,GB) while preserving convergence. (4)~At $N=4$ workers, Gossip SGD achieves superior parallel efficiency ($57.45\%$ vs.\ $51.87\%$). (5)~Gossip SGD tolerates worker crashes via autonomous peer pruning without training disruption, whereas Downpour SGD halts irreversibly upon Parameter Server failure. These measurement-backed findings align empirical systems behavior with NeurIPS 2017 D-PSGD theoretical principles.
 \end{abstract}
@@ -175,6 +175,7 @@ Table~\ref{tab:config} summarizes the complete experimental hardware and softwar
 \caption{Experimental Hardware \& System Configuration}
 \label{tab:config}
 \centering
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{ll}
 \toprule
 \textbf{Parameter} & \textbf{Value} \\
@@ -201,7 +202,8 @@ Simulated Bandwidths & Unlimited ($\infty$), $100\text{ Mbps}$ \\
 Workers ($N$) & $N \in \{2, 4\}$ \\
 Random Seeds & $42, 123, 999$ ($\text{mean} \pm \text{std}$) \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 % ================================================================
@@ -216,6 +218,7 @@ Table~\ref{tab:convergence} presents per-epoch training metrics for both archite
 \caption{Per-Epoch Training Metrics ($N=2$, 3 Epochs)}
 \label{tab:convergence}
 \centering
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lcccc}
 \toprule
 \textbf{System} & \textbf{Worker} & \textbf{Epoch} & \textbf{Loss} & \textbf{Accuracy (\%)} \\
@@ -236,7 +239,8 @@ Gossip   & $W_0$ & 1 & 2.075 & 22.53 \\
          &       & 2 & 1.659 & 39.08 \\
          &       & 3 & 1.431 & 48.17 \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 \begin{figure}[htbp]
@@ -262,6 +266,7 @@ Table~\ref{tab:scalability_baseline} presents wall-clock execution time for $N \
 \caption{Scalability: Wall-Clock Time vs.\ Worker Count (2 Epochs)}
 \label{tab:scalability_baseline}
 \centering
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lccc}
 \toprule
 \textbf{System} & \textbf{$N$} & \textbf{Time (s)} & \textbf{$\Delta$ vs.\ $N=2$} \\
@@ -272,7 +277,8 @@ Downpour SGD & 4 & 103.90 & $-15.1\%$ \\
 Gossip SGD   & 2 & 130.29 & --- \\
 Gossip SGD   & 4 & 184.53 & $+41.6\%$ \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 \begin{figure}[htbp]
@@ -291,6 +297,7 @@ Table~\ref{tab:payload} summarizes cumulative network payload over 3 epochs ($N=
 \caption{Cumulative Network Payload ($N=2$, 3 Epochs)}
 \label{tab:payload}
 \centering
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lcccc}
 \toprule
 \textbf{System} & \textbf{$W$} & \textbf{Sent (GB)} & \textbf{Recv (GB)} & \textbf{Total (GB)} \\
@@ -305,7 +312,8 @@ Gossip   & $W_0$ & 5.502 & 5.502 & 11.004 \\
 \cmidrule{2-5}
 Gossip Total   & & & & \textbf{22.008} \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 \begin{figure}[htbp]
@@ -329,6 +337,7 @@ Table~\ref{tab:fault_gossip} records surviving worker metrics after $W_1$ crash 
 \caption{Gossip SGD: Surviving Worker Metrics After $W_1$ Crash at Epoch 2}
 \label{tab:fault_gossip}
 \centering
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{ccccc}
 \toprule
 \textbf{Worker} & \textbf{Ep.} & \textbf{Loss} & \textbf{Acc. (\%)} & \textbf{Active Peers} \\
@@ -341,7 +350,8 @@ $W_2$ & 1 & 2.267 & 15.60 & 2 \\
       & 2 & 1.943 & 28.52 & 1 \\
       & 3 & 1.737 & 36.45 & 0 \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 \begin{figure}[htbp]
@@ -360,6 +370,7 @@ Table~\ref{tab:latency} and Fig.~\ref{fig:latency} evaluate wall-clock execution
 \caption{Network Latency Impact on Execution Time ($N=2$, 1 Epoch)}
 \label{tab:latency}
 \centering
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{ccccc}
 \toprule
 \textbf{Latency} & \textbf{Downpour Time} & \textbf{Gossip Time} & \textbf{Downpour Samp/s} & \textbf{Gossip Samp/s} \\
@@ -369,7 +380,8 @@ Table~\ref{tab:latency} and Fig.~\ref{fig:latency} evaluate wall-clock execution
 50 ms  & 168.20 s & \textbf{164.10 s} & 158.4 & \textbf{162.3} \\
 100 ms & 245.50 s & \textbf{218.40 s} & 108.5 & \textbf{122.0} \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 \begin{figure}[htbp]
@@ -388,6 +400,7 @@ Table~\ref{tab:bandwidth} compares system performance under unlimited vs.\ $100\
 \caption{Bandwidth Throttling Matrix ($N=2$, 1 Epoch)}
 \label{tab:bandwidth}
 \centering
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lcccc}
 \toprule
 \textbf{System} & \textbf{Bandwidth} & \textbf{Time (s)} & \textbf{Throughput} & \textbf{Winner} \\
@@ -398,7 +411,8 @@ Gossip   & Unlimited ($\infty$) & 157.24 s         & 224.7 samp/s & \\
 Downpour & 100 Mbps & 175.14 s & 148.2 samp/s & \\
 Gossip   & 100 Mbps & \textbf{159.69 s} & \textbf{169.0 samp/s} & \textbf{Gossip (+15.45s)} \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 Under $100\text{ Mbps}$ bandwidth limits, Gossip SGD achieves a \textbf{15.45-second advantage} because the Parameter Server NIC experiences heavy contention ($N\times\text{payload}$), whereas P2P Gossip distributes bandwidth demand evenly ($\frac{1}{N}$).
@@ -410,6 +424,7 @@ Table~\ref{tab:frequency} and Fig.~\ref{fig:frequency} show the impact of varyin
 \caption{Gossip Frequency Trade-Off ($N=2$, 1 Epoch)}
 \label{tab:frequency}
 \centering
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{ccccc}
 \toprule
 \textbf{\texttt{gossip\_every}} & \textbf{Time (s)} & \textbf{Total Payload} & \textbf{Peak Worker Strain} & \textbf{Accuracy} \\
@@ -418,7 +433,8 @@ Table~\ref{tab:frequency} and Fig.~\ref{fig:frequency} show the impact of varyin
 5  & \textbf{46.57 s} & \textbf{1.46 GB} & \textbf{0.73 GB} & \textbf{21.18\%} \\
 10 & \textbf{32.10 s} & \textbf{0.73 GB} & \textbf{0.36 GB} & \textbf{19.84\%} \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 \begin{figure}[htbp]
@@ -431,12 +447,13 @@ Table~\ref{tab:frequency} and Fig.~\ref{fig:frequency} show the impact of varyin
 Setting \texttt{gossip\_every=5} reduces wall-clock execution time by \textbf{$1.72\times$} ($80.29\text{s} \to 46.57\text{s}$) and cuts network payload by \textbf{$5\times$} ($7.32\text{ GB} \to 1.46\text{ GB}$).
 
 \subsection{Extended Scalability and Parallel Efficiency ($N \in \{2, 4\}$)}
-Table~\ref{tab:scalability} and Fig.~\ref{fig:scalability} report parallel speedup $S(N) = \frac{T_1}{T_N}$ and efficiency $E(N) = \frac{S(N)}{N}$.
+Table~\ref{tab:scalability_phase5} and Fig.~\ref{fig:scalability} report parallel speedup $S(N) = \frac{T_1}{T_N}$ and efficiency $E(N) = \frac{S(N)}{N}$.
 
 \begin{table}[htbp]
 \caption{Worker Scalability and Parallel Efficiency ($N \in \{2, 4\}$)}
-\label{tab:scalability}
+\label{tab:scalability_phase5}
 \centering
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lcccc}
 \toprule
 \textbf{System} & \textbf{Workers ($N$)} & \textbf{Time (s)} & \textbf{Speedup $S(N)$} & \textbf{Efficiency $E(N)$} \\
@@ -447,7 +464,8 @@ Downpour & $N=4$ & 73.40 s & $2.07\times$ & $51.87\%$ \\
 Gossip   & $N=2$ & 74.85 s & $2.00\times$ & $100.0\%$ \\
 Gossip   & $N=4$ & \textbf{65.14 s} & \textbf{$2.30\times$} & \textbf{$57.45\%$} \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 \begin{figure}[htbp]
@@ -466,6 +484,7 @@ Table~\ref{tab:traffic} and Fig.~\ref{fig:traffic} analyze peak single-node netw
 \caption{Single-Node Traffic Concentration}
 \label{tab:traffic}
 \centering
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lcc}
 \toprule
 \textbf{Metric} & \textbf{Downpour SGD (PS)} & \textbf{Gossip SGD (P2P)} \\
@@ -474,7 +493,8 @@ Total Cluster Payload & 3.67 GB & 7.32 GB \\
 \textbf{Peak Single-Node Load} & \textbf{3.67 GB (100\%)} & \textbf{3.66 GB (50\%)} \\
 Server NIC Bottleneck Risk & High ($N\times\text{bytes}$) & Zero (Distributed $\frac{1}{N}$) \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 \begin{figure}[htbp]
