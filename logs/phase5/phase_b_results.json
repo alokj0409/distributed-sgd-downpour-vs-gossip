@@ -1,0 +1,50 @@
+{
+  "scalability_results": [
+    {
+      "system": "Downpour",
+      "num_workers": 2,
+      "epochs": 1,
+      "wall_clock_time": 76.1478841304779,
+      "mean_accuracy": 35.71,
+      "total_throughput_samples_per_sec": 733.9160533655797,
+      "speedup": 2.0,
+      "parallel_efficiency": 1.0
+    },
+    {
+      "system": "Downpour",
+      "num_workers": 4,
+      "epochs": 1,
+      "wall_clock_time": 73.39958071708679,
+      "mean_accuracy": 9.954,
+      "total_throughput_samples_per_sec": 768.0737203442317,
+      "speedup": 2.074886079362885,
+      "parallel_efficiency": 0.5187215198407212
+    },
+    {
+      "system": "Gossip",
+      "num_workers": 2,
+      "epochs": 1,
+      "wall_clock_time": 74.84522104263306,
+      "mean_accuracy": 22.314,
+      "total_throughput_samples_per_sec": 730.0805735938706,
+      "speedup": 2.0,
+      "parallel_efficiency": 1.0
+    },
+    {
+      "system": "Gossip",
+      "num_workers": 4,
+      "epochs": 1,
+      "wall_clock_time": 65.13668537139893,
+      "mean_accuracy": 10.278,
+      "total_throughput_samples_per_sec": 868.8214846610889,
+      "speedup": 2.2980973199934143,
+      "parallel_efficiency": 0.5745243299983536
+    }
+  ],
+  "statistical_seeds": {
+    "Downpour_mean_accuracy": 34.677,
+    "Downpour_std_accuracy": 1.0535891039679521,
+    "Gossip_mean_accuracy": 22.484,
+    "Gossip_std_accuracy": 0.4327493500861659
+  }
+}

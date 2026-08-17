@@ -1,0 +1,134 @@
+{
+  "latency_experiments": [
+    {
+      "system": "Downpour",
+      "num_workers": 2,
+      "epochs": 1,
+      "latency_ms": 0,
+      "bandwidth_mbps": 0.0,
+      "wall_clock_time": 77.49343752861023,
+      "total_cluster_bytes": 3668008295,
+      "peak_node_bytes": 3668008295,
+      "mean_accuracy": 34.122,
+      "mean_loss": 1.8293307812317559
+    },
+    {
+      "system": "Gossip",
+      "num_workers": 2,
+      "epochs": 1,
+      "gossip_every": 1,
+      "latency_ms": 0,
+      "bandwidth_mbps": 0.0,
+      "wall_clock_time": 81.48340368270874,
+      "total_cluster_bytes": 7331273382,
+      "peak_node_bytes": 3667981948,
+      "mean_accuracy": 24.206,
+      "mean_loss": 2.0551033623688055
+    },
+    {
+      "system": "Downpour",
+      "num_workers": 2,
+      "epochs": 1,
+      "latency_ms": 20,
+      "bandwidth_mbps": 0.0,
+      "wall_clock_time": 114.91371273994446,
+      "total_cluster_bytes": 3668008295,
+      "peak_node_bytes": 3668008295,
+      "mean_accuracy": 34.616,
+      "mean_loss": 1.8428380032024725
+    },
+    {
+      "system": "Gossip",
+      "num_workers": 2,
+      "epochs": 1,
+      "gossip_every": 1,
+      "latency_ms": 20,
+      "bandwidth_mbps": 0.0,
+      "wall_clock_time": 172.87969636917114,
+      "total_cluster_bytes": 7326582868,
+      "peak_node_bytes": 3663291434,
+      "mean_accuracy": 21.52,
+      "mean_loss": 2.106093026030704
+    }
+  ],
+  "bandwidth_experiments": [
+    {
+      "system": "Downpour",
+      "num_workers": 2,
+      "epochs": 1,
+      "latency_ms": 0.0,
+      "bandwidth_mbps": 0,
+      "wall_clock_time": 76.5523910522461,
+      "total_cluster_bytes": 3668008295,
+      "peak_node_bytes": 3668008295,
+      "mean_accuracy": 34.116,
+      "mean_loss": 1.8499322690622275
+    },
+    {
+      "system": "Gossip",
+      "num_workers": 2,
+      "epochs": 1,
+      "gossip_every": 1,
+      "latency_ms": 0.0,
+      "bandwidth_mbps": 0,
+      "wall_clock_time": 157.24075865745544,
+      "total_cluster_bytes": 7321892354,
+      "peak_node_bytes": 3663291434,
+      "mean_accuracy": 22.474,
+      "mean_loss": 2.0906432310638525
+    },
+    {
+      "system": "Downpour",
+      "num_workers": 2,
+      "epochs": 1,
+      "latency_ms": 0.0,
+      "bandwidth_mbps": 100,
+      "wall_clock_time": 175.14427542686462,
+      "total_cluster_bytes": 3668008295,
+      "peak_node_bytes": 3668008295,
+      "mean_accuracy": 35.616,
+      "mean_loss": 1.7873871288336147
+    },
+    {
+      "system": "Gossip",
+      "num_workers": 2,
+      "epochs": 1,
+      "gossip_every": 1,
+      "latency_ms": 0.0,
+      "bandwidth_mbps": 100,
+      "wall_clock_time": 159.69276452064514,
+      "total_cluster_bytes": 7326582868,
+      "peak_node_bytes": 3663291434,
+      "mean_accuracy": 23.448,
+      "mean_loss": 2.059446806950337
+    }
+  ],
+  "gossip_frequency_experiments": [
+    {
+      "system": "Gossip",
+      "num_workers": 2,
+      "epochs": 1,
+      "gossip_every": 1,
+      "latency_ms": 0.0,
+      "bandwidth_mbps": 0.0,
+      "wall_clock_time": 80.28825902938843,
+      "total_cluster_bytes": 7321892354,
+      "peak_node_bytes": 3663291434,
+      "mean_accuracy": 22.747999999999998,
+      "mean_loss": 2.07489269423058
+    },
+    {
+      "system": "Gossip",
+      "num_workers": 2,
+      "epochs": 1,
+      "gossip_every": 5,
+      "latency_ms": 0.0,
+      "bandwidth_mbps": 0.0,
+      "wall_clock_time": 46.571794271469116,
+      "total_cluster_bytes": 1463440368,
+      "peak_node_bytes": 731720184,
+      "mean_accuracy": 21.182000000000002,
+      "mean_loss": 2.103953583008798
+    }
+  ]
+}
