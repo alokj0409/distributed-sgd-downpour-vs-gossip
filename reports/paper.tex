@@ -290,7 +290,7 @@ Gossip   & 100 Mbps & \textbf{159.69 s} & \textbf{169.0 samp/s} & \textbf{Gossip
 \end{tabular}
 \end{table}
 
-Under $100\text{ Mbps}$ bandwidth limits, Gossip SGD achieves a **15.45-second advantage** because the Parameter Server NIC experiences heavy contention ($N\times\text{payload}$), whereas P2P Gossip distributes bandwidth demand evenly ($\frac{1}{N}$).
+Under $100\text{ Mbps}$ bandwidth limits, Gossip SGD achieves a \textbf{15.45-second advantage} because the Parameter Server NIC experiences heavy contention ($N\times\text{payload}$), whereas P2P Gossip distributes bandwidth demand evenly ($\frac{1}{N}$).
 
 \subsection{Gossip Exchange Frequency Optimization}
 Table~\ref{tab:frequency} and Fig.~\ref{fig:frequency} show the impact of varying \texttt{gossip\_every} interval ($1, 5, 10$ mini-batches).
@@ -317,7 +317,7 @@ Table~\ref{tab:frequency} and Fig.~\ref{fig:frequency} show the impact of varyin
 \label{fig:frequency}
 \end{figure}
 
-Setting \texttt{gossip\_every=5} reduces wall-clock execution time by **$1.72\times$** ($80.29\text{s} \to 46.57\text{s}$) and cuts network payload by **$5\times$** ($7.32\text{ GB} \to 1.46\text{ GB}$).
+Setting \texttt{gossip\_every=5} reduces wall-clock execution time by \textbf{$1.72\times$} ($80.29\text{s} \to 46.57\text{s}$) and cuts network payload by \textbf{$5\times$} ($7.32\text{ GB} \to 1.46\text{ GB}$).
 
 \subsection{Extended Scalability and Parallel Efficiency ($N \in \{2, 4\}$)}
 Table~\ref{tab:scalability} and Fig.~\ref{fig:scalability} report parallel speedup $S(N) = \frac{T_1}{T_N}$ and efficiency $E(N) = \frac{S(N)}{N}$.
@@ -402,7 +402,7 @@ $W_2$ & 1 & 2.267 & 15.60 & 2 \\
 Gossip SGD workers caught \texttt{grpc.RpcError} (\texttt{StatusCode.UNAVAILABLE}) when $W_1$ was killed, pruned it from active candidate pools, and continued training to completion. Downpour SGD workers attempted push/pull RPCs, retried three times, logged \texttt{[SYSTEM HALT]}, and exited. This confirms the Parameter Server as a single point of failure (SPOF).
 
 \subsection{Multi-Seed Statistical Fairness}
-Evaluating across 3 random seeds (`42, 123, 999`) confirms statistical stability:
+Evaluating across 3 random seeds ($42, 123, 999$) confirms statistical stability:
 \begin{itemize}
     \item \textbf{Downpour SGD Mean Test Accuracy}: $34.68\% \pm 1.05\%$
     \item \textbf{Gossip SGD Mean Test Accuracy}: $22.48\% \pm 0.43\%$
@@ -427,7 +427,7 @@ Our empirical findings validate key theoretical claims of Lian et al.~\cite{lian
 
 This paper presented a reproducible empirical benchmark suite comparing Downpour SGD and Gossip SGD across network latency, bandwidth throttling, exchange frequency, and worker scalability parameters. 
 
-Principal findings: While Downpour SGD provides fast initial convergence on unconstrained local loopback networks, Decentralized Gossip SGD is the superior architectural choice under **bandwidth constraints ($\le 100\text{ Mbps}$)** and **high network latencies ($\ge 50\text{ ms}$)**. Optimizing exchange frequency to $\text{gossip\_every}=5$ cuts network payload by $80\%$ and delivers $57.45\%$ parallel efficiency at $N=4$ workers.
+Principal findings: While Downpour SGD provides fast initial convergence on unconstrained local loopback networks, Decentralized Gossip SGD is the superior architectural choice under \textbf{bandwidth constraints ($\le 100\text{ Mbps}$)} and \textbf{high network latencies ($\ge 50\text{ ms}$)}. Optimizing exchange frequency to $\text{gossip\_every}=5$ cuts network payload by $80\%$ and delivers $57.45\%$ parallel efficiency at $N=4$ workers.
 
 % ================================================================
 %  REFERENCES
