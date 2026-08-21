@@ -42,7 +42,7 @@ Downpour SGD and Gossip SGD}
 \begin{abstract}
 Distributed Stochastic Gradient Descent (SGD) is foundational to large-scale deep learning. Two dominant paradigms exist: the \emph{centralized Parameter Server} (PS) approach, exemplified by Downpour SGD, and \emph{decentralized peer-to-peer} weight averaging, exemplified by Gossip SGD. While theoretical properties of decentralized algorithms have been established, controlled empirical comparisons under systematically varied network latency, bandwidth caps, exchange frequencies, and failure conditions remain sparse. This paper presents a controlled systems-level empirical study implemented from scratch using PyTorch~2.13, gRPC~1.83, and Protocol Buffers on an Intel Core i5-12450H host (16\,GB RAM, CPU-only). We train a four-layer Convolutional Neural Network (CNN, 586,250 parameters) on CIFAR-10 across five experimental dimensions: optimizer fairness ablation, fine-grained network latency simulation ($0\to 100$\,ms), multi-point bandwidth throttling ($\infty\to 100$\,Mbps), gossip exchange frequency sweeps ($\text{gossip\_every} \in \{1,5,10\}$), worker scalability ($N \in \{2,4\}$), Communication Concentration Ratio ($CCR$), and symmetric fault-injection resilience.
 
-Key empirical findings under our evaluated configuration: (1)~To enforce optimizer fairness, matching both systems under Momentum SGD ($\mu=0.9$) provides evidence that Downpour SGD achieves $32.09\%$ Epoch-1 test accuracy versus $22.06\%$ for Gossip SGD, demonstrating that early-convergence differences persist under a matched Momentum SGD optimizer. (2)~Under simulated network latency of $100$\,ms, Decentralized Gossip SGD completed execution in $132.17$\,s versus $205.11$\,s for Downpour SGD ($72.94$\,s gap) due to pairwise P2P weight exchange avoiding centralized blocking round-trips. (3)~Optimizing gossip exchange frequency ($\text{gossip\_every}=5$) yields a $1.72\times$ wall-clock speedup ($80.29$\,s to $46.57$\,s) and a $5\times$ network payload reduction ($7.32$\,GB to $1.46$\,GB) with a measured reduction in one-epoch accuracy ($21.18\%$ vs.\ $22.75\%$). (4)~At $N=4$ workers, Gossip SGD achieves higher measured parallel efficiency ($57.45\%$ vs.\ $51.87\%$). (5)~We formalize the Communication Concentration Ratio ($CCR$), demonstrating that Downpour concentrates $100\%$ of cluster traffic at the PS ($CCR=1.0$), whereas our balanced pairwise Gossip configuration empirically follows $CCR \approx 1/N$. (6)~Symmetric fault testing demonstrates that both architectures survive worker crashes without training interruption, whereas our single-process Parameter Server implementation constitutes a single point of failure upon coordinator crash.
+Key empirical findings under our evaluated configuration: (1)~To enforce optimizer fairness, matching both systems under Momentum SGD ($\mu=0.9$) provides evidence that Downpour SGD achieves $32.09\%$ Epoch-1 test accuracy versus $22.06\%$ for Gossip SGD, demonstrating that early-convergence differences persist under a matched Momentum SGD optimizer. (2)~Under simulated network latency of $100$\,ms, Decentralized Gossip SGD completed execution in $132.17$\,s versus $205.11$\,s for Downpour SGD ($72.94$\,s gap) due to pairwise P2P weight exchange avoiding centralized blocking round-trips. (3)~Optimizing gossip exchange frequency ($\text{gossip\_every}=5$) yields a $1.72\times$ wall-clock speedup ($80.29$\,s to $46.57$\,s) and a $5\times$ network payload reduction ($7.32$\,GB to $1.46$\,GB) with a measured reduction in one-epoch accuracy ($21.18\%$ vs.\ $22.75\%$). (4)~At $N=4$ workers, Gossip SGD achieves higher measured parallel efficiency ($57.45\%$ vs.\ $51.87\%$). (5)~We formalize the Communication Concentration Ratio ($CCR$), demonstrating that Downpour concentrates $100\%$ of cluster traffic at the PS ($CCR=1.0$), whereas our balanced pairwise Gossip configuration empirically follows $CCR \approx 1/N$. (6)~Symmetric fault testing demonstrates that both architectures survive worker crashes without training interruption ($46.21\%$ vs.\ $36.00\%$ surviving accuracy), whereas our single-process Parameter Server implementation constitutes a single point of failure upon coordinator crash.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -421,7 +421,7 @@ Gossip SGD (P2P)  & $N=4$ & 1.83 GB & \textbf{0.25 (25\%)} \\
 \end{figure}
 
 \subsection{Symmetric Fault-Tolerance Results}
-Table~\ref{tab:fault_symmetric} presents symmetric fault-tolerance results comparing Downpour Worker Crash, Gossip Worker Crash, and Downpour PS Crash.
+Table~\ref{tab:fault_symmetric} presents symmetric fault-tolerance results comparing Downpour Worker Crash, Gossip Worker Crash, and Downpour PS Crash ($N=3$, Epoch 2 Crash).
 
 \begin{table}[htbp]
 \caption{Symmetric Fault-Tolerance Comparison ($N=3$, Epoch 2 Crash)}
@@ -432,8 +432,8 @@ Table~\ref{tab:fault_symmetric} presents symmetric fault-tolerance results compa
 \toprule
 \textbf{Scenario} & \textbf{Crashed Entity} & \textbf{Execution} & \textbf{Surviving Acc. (\%)} & \textbf{Final Status} \\
 \midrule
-Downpour Worker Crash & Worker $W_1$ & Uninterrupted & 47.37\% & Training Complete \\
-Gossip Worker Crash   & Worker $W_1$ & Uninterrupted & 36.45\% & Dynamic Pruned \\
+Downpour Worker Crash & Worker $W_1$ & Uninterrupted & \textbf{46.21\%} ($W_0, W_2$) & Training Complete \\
+Gossip Worker Crash   & Worker $W_1$ & Uninterrupted & \textbf{36.00\%} ($W_0, W_2$) & Dynamic Pruned \\
 Downpour PS Crash     & PS Coordinator & Halted & N/A & \texttt{[SYSTEM HALT]} \\
 \bottomrule
 \end{tabular}%
@@ -447,7 +447,7 @@ Downpour PS Crash     & PS Coordinator & Halted & N/A & \texttt{[SYSTEM HALT]} \
 \label{fig:fault_gossip}
 \end{figure}
 
-Symmetric fault testing demonstrates that both architectures survive worker crashes without training interruption. Gossip SGD workers caught \texttt{grpc.RpcError} (\texttt{StatusCode.UNAVAILABLE}), pruned $W_1$ from candidate pools, and continued training. Downpour SGD workers also continued pushing gradients to the PS when worker $W_1$ crashed. However, when the Parameter Server coordinator was killed, Downpour workers retried three times, logged \texttt{[SYSTEM HALT]}, and exited. This confirms that the single-process Parameter Server implementation used in our study constitutes a single point of failure (SPOF).
+Symmetric fault testing demonstrates that both architectures survive worker crashes without training interruption. Gossip SGD workers caught \texttt{grpc.RpcError} (\texttt{StatusCode.UNAVAILABLE}), pruned $W_1$ from candidate pools, and continued training. Downpour SGD workers also continued pushing gradients to the PS when worker $W_1$ crashed (achieving $46.21\%$ mean surviving accuracy across $W_0$ and $W_2$). However, when the Parameter Server coordinator was killed, Downpour workers retried three times, logged \texttt{[SYSTEM HALT]}, and exited. This confirms that the single-process Parameter Server implementation used in our study constitutes a single point of failure (SPOF).
 
 \subsection{Multi-Seed Statistical Fairness}
 Evaluating across 3 random seeds ($42, 123, 999$) confirms statistical stability:
