@@ -1,5 +1,5 @@
 %% ================================================================
-%% IEEE Conference Paper — paper.tex (Master Revised Submission)
+%% IEEE Conference Paper — paper.tex (Master Calibrated Submission)
 %% Title: Centralized vs. Decentralized Distributed Training:
 %%        A Controlled Systems-Level Empirical Comparison of
 %%        Downpour SGD and Gossip SGD
@@ -40,9 +40,9 @@ Downpour SGD and Gossip SGD}
 %  ABSTRACT
 % ================================================================
 \begin{abstract}
-Distributed Stochastic Gradient Descent (SGD) is foundational to large-scale deep learning. Two dominant paradigms exist: the \emph{centralized Parameter Server} (PS) approach, exemplified by Downpour SGD, and \emph{decentralized peer-to-peer} weight averaging, exemplified by Gossip SGD. While theoretical properties of decentralized algorithms have been established, controlled empirical comparisons under systematically varied network latency, bandwidth caps, exchange frequencies, and failure conditions remain sparse. This paper presents a controlled systems-level empirical study implemented from scratch using PyTorch~2.13, gRPC~1.83, and Protocol Buffers on an Intel Core i5-12450H host (16\,GB RAM, CPU-only). We train a four-layer Convolutional Neural Network (CNN, 586,250 parameters) on CIFAR-10 across five experimental dimensions: optimizer fairness ablation, fine-grained network latency simulation ($0\to 100$\,ms), multi-point bandwidth throttling ($\infty\to 100$\,Mbps), gossip exchange frequency sweeps ($\text{gossip\_every} \in \{1,5,10\}$), worker scalability ($N \in \{2,4\}$), Communication Concentration Ratio ($CCR$), and live fault-injection resilience.
+Distributed Stochastic Gradient Descent (SGD) is foundational to large-scale deep learning. Two dominant paradigms exist: the \emph{centralized Parameter Server} (PS) approach, exemplified by Downpour SGD, and \emph{decentralized peer-to-peer} weight averaging, exemplified by Gossip SGD. While theoretical properties of decentralized algorithms have been established, controlled empirical comparisons under systematically varied network latency, bandwidth caps, exchange frequencies, and failure conditions remain sparse. This paper presents a controlled systems-level empirical study implemented from scratch using PyTorch~2.13, gRPC~1.83, and Protocol Buffers on an Intel Core i5-12450H host (16\,GB RAM, CPU-only). We train a four-layer Convolutional Neural Network (CNN, 586,250 parameters) on CIFAR-10 across five experimental dimensions: optimizer fairness ablation, fine-grained network latency simulation ($0\to 100$\,ms), multi-point bandwidth throttling ($\infty\to 100$\,Mbps), gossip exchange frequency sweeps ($\text{gossip\_every} \in \{1,5,10\}$), worker scalability ($N \in \{2,4\}$), Communication Concentration Ratio ($CCR$), and symmetric fault-injection resilience.
 
-Key empirical findings under our evaluated configuration: (1)~To enforce optimizer fairness, matching both systems under Momentum SGD ($\mu=0.9$) demonstrates that Downpour SGD achieves $32.09\%$ Epoch-1 test accuracy versus $22.06\%$ for Gossip SGD, proving that Parameter Server early convergence advantage is an architectural property rather than an optimizer artifact. (2)~Under simulated network latency of $100$\,ms, Decentralized Gossip SGD outpaces Centralized Downpour SGD by $72.94$\,s ($132.17$\,s vs.\ $205.11$\,s) due to asynchronous P2P weight averaging avoiding centralized blocking round-trips. (3)~Optimizing gossip exchange frequency ($\text{gossip\_every}=5$) yields a $1.72\times$ wall-clock speedup ($80.29$\,s to $46.57$\,s) and a $5\times$ network payload reduction ($7.32$\,GB to $1.46$\,GB) while preserving convergence. (4)~At $N=4$ workers, Gossip SGD achieves higher measured parallel efficiency ($57.45\%$ vs.\ $51.87\%$). (5)~We formalize the Communication Concentration Ratio ($CCR = \text{Peak Node Traffic} / \text{Total Traffic}$), demonstrating that Downpour concentrates $100\%$ of cluster traffic at the single PS ($CCR=1.0$), whereas Gossip distributes bandwidth demand ($CCR=1/N$).
+Key empirical findings under our evaluated configuration: (1)~To enforce optimizer fairness, matching both systems under Momentum SGD ($\mu=0.9$) provides evidence that Downpour SGD achieves $32.09\%$ Epoch-1 test accuracy versus $22.06\%$ for Gossip SGD, demonstrating that early-convergence differences persist under a matched Momentum SGD optimizer. (2)~Under simulated network latency of $100$\,ms, Decentralized Gossip SGD completed execution in $132.17$\,s versus $205.11$\,s for Downpour SGD ($72.94$\,s gap) due to pairwise P2P weight exchange avoiding centralized blocking round-trips. (3)~Optimizing gossip exchange frequency ($\text{gossip\_every}=5$) yields a $1.72\times$ wall-clock speedup ($80.29$\,s to $46.57$\,s) and a $5\times$ network payload reduction ($7.32$\,GB to $1.46$\,GB) with a measured reduction in one-epoch accuracy ($21.18\%$ vs.\ $22.75\%$). (4)~At $N=4$ workers, Gossip SGD achieves higher measured parallel efficiency ($57.45\%$ vs.\ $51.87\%$). (5)~We formalize the Communication Concentration Ratio ($CCR$), demonstrating that Downpour concentrates $100\%$ of cluster traffic at the PS ($CCR=1.0$), whereas our balanced pairwise Gossip configuration empirically follows $CCR \approx 1/N$. (6)~Symmetric fault testing demonstrates that both architectures survive worker crashes without training interruption, whereas our single-process Parameter Server implementation constitutes a single point of failure upon coordinator crash.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -57,31 +57,31 @@ Distributed Machine Learning, Distributed SGD, Downpour SGD, Gossip SGD, Paramet
 The computational demands of modern deep-learning models have consistently outpaced single-machine capacity. Training large neural networks requires distributing gradient computation across multiple worker processes or physical nodes~\cite{dean2012large}. This distribution introduces a fundamental architectural choice: \emph{how} should model parameters be maintained, communicated, and updated across workers?
 
 \subsection{Centralized Parameter Server}
-The centralized paradigm, formalized in DistBelief and Downpour SGD~\cite{dean2012large}, designates one or more Parameter Server (PS) nodes as the authoritative keeper of global model weights. Worker nodes asynchronously push locally-computed gradients to the PS, which applies an update rule (e.g., Adagrad~\cite{duchi2011adaptive} or SGD with momentum) and serves the latest weights on demand. This architecture enables fast early convergence, but concentrates network bandwidth and introduces a single point of failure at the PS.
+The centralized paradigm, formalized in DistBelief and Downpour SGD~\cite{dean2012large}, designates one or more Parameter Server (PS) nodes as the authoritative keeper of global model weights. Worker nodes asynchronously push locally-computed gradients to the PS, which applies an update rule (e.g., Adagrad~\cite{duchi2011adaptive} or SGD with momentum) and serves the latest weights on demand. This architecture enables fast early convergence, but concentrates network bandwidth and introduces a potential single point of failure at the PS node.
 
-\subsection{Decentralized Gossip-Based SGD}
-Decentralized approaches eliminate the central server entirely~\cite{lian2017can}. In Gossip SGD, each worker maintains its own local model copy, trains on a local data shard, and periodically exchanges model weights with a randomly selected peer. Both sides average their weights after exchange, driving the cluster toward parameter consensus. Without a central bottleneck, this architecture scales more gracefully and tolerates node failures without global disruption~\cite{blot2016gossip}.
+\subsection{Decentralized Pairwise Gossip-Based SGD}
+Decentralized approaches eliminate the central server entirely~\cite{lian2017can}. In Gossip SGD, each worker maintains its own local model copy, trains on a local data shard, and performs blocking pairwise P2P weight exchange with a randomly selected peer. Both sides average their weights after exchange, driving the cluster toward parameter consensus. Without a central bottleneck, this architecture scales more gracefully and tolerates node failures without global disruption~\cite{blot2016gossip}.
 
 \subsection{Research Gap and Positioning}
-Prior literature has established theoretical bounds for Decentralized Parallel SGD (D-PSGD)~\cite{lian2017can}. However, our study does not claim theoretical novelty regarding decentralized SGD. Instead, we position this work as a \textbf{controlled systems-level empirical evaluation} of Parameter Server vs.\ pairwise Gossip SGD under systematically varied network latency, bandwidth constraints, communication frequencies, optimizer settings, and worker failures.
+Prior literature has established theoretical bounds for Decentralized Parallel SGD (D-PSGD)~\cite{lian2017can}. However, our study does not claim theoretical novelty regarding decentralized SGD. Instead, we position this work as a \textbf{controlled systems-level empirical evaluation} of Parameter Server vs.\ blocking pairwise Gossip SGD under systematically varied network latency, bandwidth constraints, communication frequencies, optimizer settings, and worker failures.
 
 This paper addresses four concrete research questions:
 \begin{enumerate}
     \item \textbf{RQ1 (Optimizer Fairness)}: Does Parameter Server early convergence advantage persist when both paradigms are evaluated under identical Momentum SGD optimizers?
-    \item \textbf{RQ2 (Latency \& Bandwidth Crossover)}: Under what empirical latency $\Delta t$ and bandwidth throttling levels does Decentralized Gossip SGD outpace Parameter Server execution?
-    \item \textbf{RQ3 (Communication Frequency)}: What is the trade-off between \texttt{gossip\_every} interval ($1, 5, 10$) and wall-clock execution time vs.\ network payload?
-    \item \textbf{RQ4 (Communication Concentration \& Faults)}: How does the Communication Concentration Ratio ($CCR$) impact scalability and fault resilience across worker counts $N \in \{2, 4\}$?
+    \item \textbf{RQ2 (Network Latency Impact)}: How does simulated network latency change relative execution time across centralized and decentralized configurations?
+    \item \textbf{RQ3 (Communication Frequency)}: What is the trade-off between \texttt{gossip\_every} interval ($1, 5, 10$) and wall-clock execution time vs.\ network payload and accuracy?
+    \item \textbf{RQ4 (Communication Concentration \& Faults)}: How does the Communication Concentration Ratio ($CCR$) impact scalability and symmetric fault resilience across worker counts $N \in \{2, 4\}$?
 \end{enumerate}
 
 \subsection{Key Contributions}
 This work makes the following concrete contributions:
 \begin{enumerate}
     \item \textbf{Reproducible gRPC Implementation}: Fully functional Downpour SGD and Gossip SGD implementations built from scratch in Python/PyTorch over gRPC 1.83 and Protobuf.
-    \item \textbf{Optimizer Fairness Ablation}: A 4-way optimizer ablation suite isolating architectural network effects from optimizer update rules.
+    \item \textbf{Optimizer Fairness Ablation}: A 4-way optimizer ablation suite isolating architectural network effects from optimizer update rules under matched Momentum SGD.
     \item \textbf{Controlled Network Simulation}: A software simulation engine via gRPC interceptors (\texttt{NetworkSimulatorClientInterceptor}) evaluating artificial latency ($0\to 100$\,ms) and bandwidth caps.
-    \item \textbf{Communication Trade-Off Analysis}: Empirical evaluation of gossip exchange intervals ($\text{gossip\_every} \in \{1, 5, 10\}$), proving a $1.72\times$ runtime speedup and $5\times$ network traffic drop.
+    \item \textbf{Communication Trade-Off Analysis}: Empirical evaluation of gossip exchange intervals ($\text{gossip\_every} \in \{1, 5, 10\}$), quantifying runtime speedup, payload drop, and accuracy impact.
     \item \textbf{Communication Concentration Formalization}: Introduction and empirical evaluation of the Communication Concentration Ratio ($CCR = \text{Peak Node Load} / \text{Total Payload}$).
-    \item \textbf{Fault-Injection Comparison}: Live process-kill evaluation comparing dynamic peer pruning vs.\ Parameter Server single point of failure (SPOF).
+    \item \textbf{Symmetric Fault-Injection Comparison}: Controlled process-kill evaluation comparing worker-crash resilience in both systems alongside Parameter Server coordinator failure.
 \end{enumerate}
 
 % ================================================================
@@ -96,10 +96,10 @@ Dean et al.~\cite{dean2012large} introduced DistBelief and Downpour SGD, where m
 Lian et al.~\cite{lian2017can} formally analyzed Decentralized Parallel SGD (D-PSGD), proving theoretical convergence for non-convex objectives under doubly-stochastic mixing matrices. Jin et al.~\cite{jin2016scale} and Blot et al.~\cite{blot2016gossip} studied gossip-style weight averaging, demonstrating spectral mixing on complete graphs. Nedic and Ozdaglar~\cite{nedic2009distributed} provided foundational theory for distributed subgradient convergence over peer networks.
 
 \subsection{Direct Comparison with Lian et al. (NeurIPS 2017)}
-While Lian et al.~\cite{lian2017can} establish theoretical convergence bounds and large-scale cluster measurements for D-PSGD, our work explicitly examines a gRPC-based Downpour Parameter Server implementation against pairwise Gossip SGD under controlled latency, bandwidth throttling, communication-frequency sweeps, and live worker-failure conditions on identical hardware.
+While Lian et al.~\cite{lian2017can} establish theoretical convergence bounds and large-scale cluster measurements for D-PSGD, our work explicitly examines a reproducible gRPC-based Downpour Parameter Server implementation against blocking pairwise Gossip SGD under controlled latency, bandwidth throttling, communication-frequency sweeps, and symmetric worker-failure conditions on identical hardware.
 
 \subsection{Fault Tolerance in Distributed Deep Learning}
-Synchronous all-reduce systems (e.g., Horovod~\cite{sergeev2018horovod}) require all workers in every step, making them highly sensitive to crashes. Asynchronous PS systems handle worker failures gracefully (missing pushes are simply omitted) but lose their entire state on PS failure~\cite{ho2013more}. Gossip systems have the theoretical advantage of no single critical node, a property empirically verified in this work.
+Synchronous all-reduce systems (e.g., Horovod~\cite{sergeev2018horovod}) require all workers in every step, making them highly sensitive to crashes. Asynchronous PS systems handle worker failures gracefully (missing pushes are simply omitted) but lose their state on PS failure~\cite{ho2013more}. Gossip systems have no single critical node, a property empirically verified in this work.
 
 % ================================================================
 %  III. SYSTEM ARCHITECTURE AND DESIGN
@@ -150,7 +150,7 @@ To quantify network load imbalance, we formalize the Communication Concentration
 \begin{equation}
     CCR = \frac{\max_i (\text{bytes\_sent}_i + \text{bytes\_recv}_i)}{\sum_{j=1}^N (\text{bytes\_sent}_j + \text{bytes\_recv}_j)}
 \end{equation}
-For Centralized Downpour SGD, $CCR = 1.00$ ($100\%$ of traffic concentrates at the Parameter Server). For Decentralized Gossip SGD, $CCR = \frac{1}{N}$ ($50\%$ for $N=2$, $25\%$ for $N=4$).
+For Centralized Downpour SGD, $CCR = 1.00$ ($100\%$ of traffic concentrates at the Parameter Server). For our measured balanced pairwise Gossip configuration, traffic empirically follows $CCR \approx \frac{1}{N}$ ($50\%$ for $N=2$, $25\%$ for $N=4$).
 
 % ================================================================
 %  IV. EXPERIMENTAL METHODOLOGY
@@ -199,10 +199,10 @@ Random Seeds & $42, 123, 999$ ($\text{mean} \pm \text{std}$) \\
 \section{Results}
 
 \subsection{Optimizer Fairness & Ablation Results}
-Table~\ref{tab:ablation} and Fig.~\ref{fig:ablation} report the 4-way optimizer ablation matrix evaluating Downpour SGD and Gossip SGD under identical Momentum SGD ($\mu=0.9$), Adagrad, and Vanilla SGD settings ($N=2, 1$ epoch).
+Table~\ref{tab:ablation} and Fig.~\ref{fig:ablation} report the 4-way optimizer ablation matrix evaluating Downpour SGD and Gossip SGD under identical Momentum SGD ($\mu=0.9$), Adagrad, and Vanilla SGD settings ($N=2, 1$-epoch quick sweep).
 
 \begin{table}[htbp]
-\caption{Optimizer Fairness Ablation Matrix ($N=2$, 1 Epoch)}
+\caption{Optimizer Fairness Ablation Matrix ($N=2$, 1-Epoch Quick Sweep)}
 \label{tab:ablation}
 \centering
 \resizebox{\columnwidth}{!}{%
@@ -222,17 +222,17 @@ Gossip + Vanilla    & Gossip   & Vanilla SGD ($0.0$)  & 23.12\% & 60.65 s \\
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\columnwidth]{fig1_optimizer_ablation.png}
-\caption{Optimizer ablation comparison showing test accuracy (blue) and runtime (orange). Matching both systems under Momentum SGD ($\mu=0.9$) confirms that Downpour's early convergence advantage (+10.03\%) is an architectural property.}
+\caption{Optimizer ablation comparison showing test accuracy (blue) and runtime (orange). Matching both systems under Momentum SGD ($\mu=0.9$) provides evidence that the observed early-convergence difference (+10.03\%) persists under a matched Momentum SGD optimizer.}
 \label{fig:ablation}
 \end{figure}
 
-Matching both systems under Momentum SGD ($\mu=0.9$) demonstrates that Downpour SGD achieves **32.09\% test accuracy** vs.\ **22.06\% for Gossip SGD** (+10.03\% advantage). This confirms that Parameter Server early convergence advantage is an architectural property rather than an optimizer artifact.
+Matching both systems under Momentum SGD ($\mu=0.9$) provides evidence that Downpour SGD achieves $32.09\%$ Epoch-1 test accuracy vs.\ $22.06\%$ for Gossip SGD (+10.03\% difference), demonstrating that early-convergence differences persist under a matched Momentum SGD optimizer.
 
 \subsection{Baseline Convergence Results}
-Table~\ref{tab:convergence} presents per-epoch training metrics for both architectures ($N=2, 3$ epochs). Figs.~\ref{fig:train_curves} and~\ref{fig:conv_time} show convergence trajectories.
+Table~\ref{tab:convergence} presents per-epoch training metrics for both architectures ($N=2, 3$-epoch baseline). Figs.~\ref{fig:train_curves} and~\ref{fig:conv_time} show convergence trajectories.
 
 \begin{table}[htbp]
-\caption{Per-Epoch Training Metrics ($N=2$, 3 Epochs)}
+\caption{Per-Epoch Training Metrics ($N=2$, 3-Epoch Baseline)}
 \label{tab:convergence}
 \centering
 \resizebox{\columnwidth}{!}{%
@@ -263,24 +263,24 @@ Gossip   & $W_0$ & 1 & 2.075 & 22.53 \\
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\columnwidth]{training_curves.png}
-\caption{Training loss (left) and accuracy (right) vs.\ epoch. Downpour SGD (blue) converges faster in early epochs; both systems reach near-equivalent loss by epoch 3.}
+\caption{Training loss (left) and accuracy (right) vs.\ epoch (3-epoch baseline). Downpour SGD (blue) converges faster in early epochs; both systems reach near-equivalent loss by epoch 3.}
 \label{fig:train_curves}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\columnwidth]{convergence_vs_time.png}
-\caption{Training loss (left) and accuracy (right) vs.\ wall-clock time. Downpour completes in 166.98\,s; Gossip requires 258.01\,s ($1.54\times$ longer) due to per-batch full-model weight exchange.}
+\caption{Training loss (left) and accuracy (right) vs.\ wall-clock time (3-epoch baseline). Downpour completes in 166.98\,s; Gossip requires 258.01\,s ($1.54\times$ longer) due to per-batch full-model weight exchange.}
 \label{fig:conv_time}
 \end{figure}
 
 Downpour SGD completes 3 training epochs in 166.98\,s vs.\ 258.01\,s for Gossip SGD ($1.54\times$ faster). Final test-set accuracy: Gossip $W_0 = 55.29\%$, Downpour master $= 54.85\%$, Gossip consensus $= 54.97\%$. All three are within 0.44 percentage points, confirming convergence to comparable model quality.
 
-\subsection{Fine-Grained Network Latency Crossover Analysis}
-Table~\ref{tab:latency} and Fig.~\ref{fig:latency} evaluate wall-clock execution time under artificial latency delays ($\Delta t \in \{0, 20, 50, 100\}\text{ ms}$).
+\subsection{Network Latency Impact on Execution Time}
+Table~\ref{tab:latency} and Fig.~\ref{fig:latency} evaluate wall-clock execution time under artificial latency delays ($\Delta t \in \{0, 20, 50, 100\}\text{ ms}$, 1-epoch quick sweep).
 
 \begin{table}[htbp]
-\caption{Fine-Grained Network Latency Crossover ($N=2$, 1 Epoch)}
+\caption{Network Latency Impact on Execution Time ($N=2$, 1-Epoch Quick Sweep)}
 \label{tab:latency}
 \centering
 \resizebox{\columnwidth}{!}{%
@@ -289,9 +289,9 @@ Table~\ref{tab:latency} and Fig.~\ref{fig:latency} evaluate wall-clock execution
 \textbf{Latency} & \textbf{Downpour Time} & \textbf{Gossip Time} & \textbf{Downpour Samp/s} & \textbf{Gossip Samp/s} \\
 \midrule
 0 ms   & 61.43 s & \textbf{56.76 s} & 460.9 & 474.2 \\
-20 ms  & 87.34 s & \textbf{77.51 s} & 310.8 & \textbf{353.8 (+9.8s)} \\
-50 ms  & 134.64 s & \textbf{96.20 s} & 196.2 & \textbf{272.2 (+38.4s)} \\
-100 ms & 205.11 s & \textbf{132.17 s} & 126.3 & \textbf{200.3 (+72.9s)} \\
+20 ms  & 87.34 s & \textbf{77.51 s} & 310.8 & \textbf{353.8 (+9.8s gap)} \\
+50 ms  & 134.64 s & \textbf{96.20 s} & 196.2 & \textbf{272.2 (+38.4s gap)} \\
+100 ms & 205.11 s & \textbf{132.17 s} & 126.3 & \textbf{200.3 (+72.9s gap)} \\
 \bottomrule
 \end{tabular}%
 }
@@ -300,42 +300,42 @@ Table~\ref{tab:latency} and Fig.~\ref{fig:latency} evaluate wall-clock execution
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\columnwidth]{fig2_fine_latency_crossover.png}
-\caption{Wall-clock execution time vs.\ network latency. Under our evaluated setup, Decentralized Gossip SGD becomes $72.94$\,s faster at $100$\,ms latency.}
+\caption{Wall-clock execution time vs.\ network latency (1-epoch quick sweep). Under our evaluated configuration, Decentralized Gossip SGD completed execution in $132.17$\,s vs.\ $205.11$\,s for Downpour SGD at $100$\,ms latency.}
 \label{fig:latency}
 \end{figure}
 
-Under our evaluated setup, Gossip SGD outpaces Downpour SGD as network latency increases, reaching a **72.94-second runtime advantage** at $100\text{ ms}$ latency ($132.17\text{s}$ vs $205.11\text{s}$).
+Under our evaluated setup, Gossip SGD completed execution in $132.17\text{s}$ vs.\ $205.11\text{s}$ for Downpour SGD at $100\text{ ms}$ latency ($72.94\text{s}$ measured gap).
 
 \subsection{Multi-Point Bandwidth Throttling Matrix}
-Table~\ref{tab:bandwidth} evaluates performance across bandwidth throttling levels ($\infty, 250, 100\text{ Mbps}$).
+Table~\ref{tab:bandwidth} evaluates performance across bandwidth throttling levels ($\infty, 250, 100\text{ Mbps}$, 1-epoch quick sweep).
 
 \begin{table}[htbp]
-\caption{Multi-Point Bandwidth Throttling Matrix ($N=2$, 1 Epoch)}
+\caption{Multi-Point Bandwidth Throttling Matrix ($N=2$, 1-Epoch Quick Sweep)}
 \label{tab:bandwidth}
 \centering
 \resizebox{\columnwidth}{!}{%
 \begin{tabular}{lcccc}
 \toprule
-\textbf{System} & \textbf{Bandwidth} & \textbf{Time (s)} & \textbf{Throughput} & \textbf{Winner} \\
+\textbf{System} & \textbf{Bandwidth} & \textbf{Time (s)} & \textbf{Throughput} & \textbf{Measured Gap} \\
 \midrule
 Downpour & Unlimited ($\infty$) & 62.18 s & 454.3 samp/s & --- \\
 Gossip   & Unlimited ($\infty$) & \textbf{63.28 s} & 423.4 samp/s & --- \\
 \midrule
 Downpour & 250 Mbps & 87.19 s & 312.3 samp/s & --- \\
-Gossip   & 250 Mbps & \textbf{86.25 s} & 304.8 samp/s & Gossip (+0.9s) \\
+Gossip   & 250 Mbps & \textbf{86.25 s} & 304.8 samp/s & Gossip (+0.9s gap) \\
 \midrule
 Downpour & 100 Mbps & 127.68 s & 207.5 samp/s & --- \\
-Gossip   & 100 Mbps & 132.09 s & 195.7 samp/s & Downpour (+4.4s) \\
+Gossip   & 100 Mbps & 132.09 s & 195.7 samp/s & Downpour (+4.4s gap) \\
 \bottomrule
 \end{tabular}%
 }
 \end{table}
 
 \subsection{Gossip Exchange Frequency Optimization}
-Table~\ref{tab:frequency} and Fig.~\ref{fig:frequency} show the impact of varying \texttt{gossip\_every} interval ($1, 5, 10$ mini-batches).
+Table~\ref{tab:frequency} and Fig.~\ref{fig:frequency} show the impact of varying \texttt{gossip\_every} interval ($1, 5, 10$ mini-batches, 1-epoch quick sweep).
 
 \begin{table}[htbp]
-\caption{Gossip Frequency Trade-Off ($N=2$, 1 Epoch)}
+\caption{Gossip Frequency Trade-Off ($N=2$, 1-Epoch Quick Sweep)}
 \label{tab:frequency}
 \centering
 \resizebox{\columnwidth}{!}{%
@@ -358,13 +358,13 @@ Table~\ref{tab:frequency} and Fig.~\ref{fig:frequency} show the impact of varyin
 \label{fig:frequency}
 \end{figure}
 
-Setting \texttt{gossip\_every=5} reduces wall-clock execution time by \textbf{$1.72\times$} ($80.29\text{s} \to 46.57\text{s}$) and cuts network payload by \textbf{$5\times$} ($7.32\text{ GB} \to 1.46\text{ GB}$).
+Setting \texttt{gossip\_every=5} reduces wall-clock execution time by \textbf{$1.72\times$} ($80.29\text{s} \to 46.57\text{s}$) and cuts network payload by \textbf{$5\times$} ($7.32\text{ GB} \to 1.46\text{ GB}$), with a measured reduction in one-epoch accuracy ($21.18\%$ vs.\ $22.75\%$).
 
 \subsection{Extended Scalability and Parallel Efficiency ($N \in \{2, 4\}$)}
-Table~\ref{tab:scalability_phase5} and Fig.~\ref{fig:scalability} report parallel speedup $S(N) = \frac{T_1}{T_N}$ and efficiency $E(N) = \frac{S(N)}{N}$.
+Table~\ref{tab:scalability_phase5} and Fig.~\ref{fig:scalability} report parallel speedup $S(N) = \frac{T_1}{T_N}$ and efficiency $E(N) = \frac{S(N)}{N}$ (2-epoch scalability).
 
 \begin{table}[htbp]
-\caption{Worker Scalability and Parallel Efficiency ($N \in \{2, 4\}$)}
+\caption{Worker Scalability and Parallel Efficiency ($N \in \{2, 4\}$, 2-Epoch Scalability)}
 \label{tab:scalability_phase5}
 \centering
 \resizebox{\columnwidth}{!}{%
@@ -389,7 +389,7 @@ Gossip   & $N=4$ & \textbf{65.14 s} & \textbf{$2.30\times$} & \textbf{$57.45\%$}
 \label{fig:scalability}
 \end{figure}
 
-Gossip SGD achieves higher measured parallel efficiency at $N=4$ under the optimized exchange configuration ($57.45\%$ vs.\ $51.87\%$).
+Gossip SGD achieves higher measured parallel efficiency at $N=4$ under the tested configuration ($57.45\%$ vs.\ $51.87\%$).
 
 \subsection{Communication Concentration Ratio ($CCR$) Analysis}
 Table~\ref{tab:ccr} and Fig.~\ref{fig:ccr} evaluate single-node traffic concentration using our formal $CCR$ metric.
@@ -420,29 +420,21 @@ Gossip SGD (P2P)  & $N=4$ & 1.83 GB & \textbf{0.25 (25\%)} \\
 \label{fig:ccr}
 \end{figure}
 
-\subsection{Fault-Tolerance Results}
-Two fault scenarios were evaluated:
-\begin{enumerate}
-    \item \textbf{Worker crash (Gossip SGD)}: Three Gossip workers were launched. Worker $W_1$ was programmatically terminated via \texttt{sys.exit(1)} at the epoch 2 boundary. Table~\ref{tab:fault_gossip} records surviving worker metrics.
-    \item \textbf{Parameter Server crash (Downpour SGD)}: The PS was allowed to process $\approx 300$ gradient steps, then forcefully killed via OS process termination. Worker retry behavior and final exit state were recorded.
-\end{enumerate}
+\subsection{Symmetric Fault-Tolerance Results}
+Table~\ref{tab:fault_symmetric} presents symmetric fault-tolerance results comparing Downpour Worker Crash, Gossip Worker Crash, and Downpour PS Crash.
 
 \begin{table}[htbp]
-\caption{Gossip SGD: Surviving Worker Metrics After $W_1$ Crash at Epoch 2}
-\label{tab:fault_gossip}
+\caption{Symmetric Fault-Tolerance Comparison ($N=3$, Epoch 2 Crash)}
+\label{tab:fault_symmetric}
 \centering
 \resizebox{\columnwidth}{!}{%
-\begin{tabular}{ccccc}
+\begin{tabular}{lcccc}
 \toprule
-\textbf{Worker} & \textbf{Ep.} & \textbf{Loss} & \textbf{Acc. (\%)} & \textbf{Active Peers} \\
+\textbf{Scenario} & \textbf{Crashed Entity} & \textbf{Execution} & \textbf{Surviving Acc. (\%)} & \textbf{Final Status} \\
 \midrule
-$W_0$ & 1 & 2.264 & 16.24 & 2 \\
-      & 2 & 1.961 & 27.43 & 1 \\
-      & 3 & 1.741 & 35.53 & 1 \\
-\midrule
-$W_2$ & 1 & 2.267 & 15.60 & 2 \\
-      & 2 & 1.943 & 28.52 & 1 \\
-      & 3 & 1.737 & 36.45 & 0 \\
+Downpour Worker Crash & Worker $W_1$ & Uninterrupted & 47.37\% & Training Complete \\
+Gossip Worker Crash   & Worker $W_1$ & Uninterrupted & 36.45\% & Dynamic Pruned \\
+Downpour PS Crash     & PS Coordinator & Halted & N/A & \texttt{[SYSTEM HALT]} \\
 \bottomrule
 \end{tabular}%
 }
@@ -455,7 +447,7 @@ $W_2$ & 1 & 2.267 & 15.60 & 2 \\
 \label{fig:fault_gossip}
 \end{figure}
 
-Gossip SGD workers caught \texttt{grpc.RpcError} (\texttt{StatusCode.UNAVAILABLE}) when $W_1$ was killed, pruned it from active candidate pools, and continued training to completion. Downpour SGD workers attempted push/pull RPCs, retried three times, logged \texttt{[SYSTEM HALT]}, and exited. This confirms the Parameter Server as a single point of failure (SPOF).
+Symmetric fault testing demonstrates that both architectures survive worker crashes without training interruption. Gossip SGD workers caught \texttt{grpc.RpcError} (\texttt{StatusCode.UNAVAILABLE}), pruned $W_1$ from candidate pools, and continued training. Downpour SGD workers also continued pushing gradients to the PS when worker $W_1$ crashed. However, when the Parameter Server coordinator was killed, Downpour workers retried three times, logged \texttt{[SYSTEM HALT]}, and exited. This confirms that the single-process Parameter Server implementation used in our study constitutes a single point of failure (SPOF).
 
 \subsection{Multi-Seed Statistical Fairness}
 Evaluating across 3 random seeds ($42, 123, 999$) confirms statistical stability:
@@ -471,16 +463,16 @@ Evaluating across 3 random seeds ($42, 123, 999$) confirms statistical stability
 \section{Discussion and Literature Alignment}
 
 \subsection{Convergence Quality & Optimizer Fairness}
-Matching both systems under Momentum SGD ($\mu=0.9$) demonstrates that Downpour SGD achieves $32.09\%$ Epoch-1 accuracy vs.\ $22.06\%$ for Gossip SGD (+10.03\% advantage). This proves that Parameter Server early convergence advantage is an architectural property (centralized gradient aggregation per batch) rather than an Adagrad optimizer artifact.
+Matching both systems under Momentum SGD ($\mu=0.9$) provides evidence that Downpour SGD achieves $32.09\%$ Epoch-1 accuracy vs.\ $22.06\%$ for Gossip SGD (+10.03\% difference). This demonstrates that early-convergence differences persist under a matched Momentum SGD optimizer rather than an Adagrad artifact.
 
 \subsection{Scalability: Diverging Trajectories}
 The scaling results reveal an important asymmetry. Downpour SGD benefits from additional workers by processing smaller per-worker shards without increasing PS computation time. Gossip SGD degrades under per-batch gossip because each worker must complete a blocking bidirectional gRPC round-trip on every mini-batch. However, optimizing \texttt{gossip\_every=5} dramatically reduces this overhead, yielding $57.45\%$ parallel efficiency at $N=4$.
 
 \subsection{Network Cost & Communication Concentration}
-The Communication Concentration Ratio ($CCR$) highlights the structural trade-off. Downpour maintains $CCR=1.00$ ($100\%$ of cluster traffic hits the single PS), creating bandwidth saturation under constrained links. Gossip distributes network demand ($CCR = 1/N$), avoiding single-node NIC bottlenecks.
+The Communication Concentration Ratio ($CCR$) highlights the structural trade-off. Downpour maintains $CCR=1.00$ ($100\%$ of cluster traffic hits the single PS), creating bandwidth saturation under constrained links. Gossip distributes network demand ($CCR \approx 1/N$), avoiding single-node NIC bottlenecks.
 
 \subsection{Fault Tolerance: Fundamental Architectural Difference}
-Gossip SGD's peer-pruning mechanism requires no external coordination and degrades gracefully. Downpour SGD has no recovery path when its PS is killed. This SPOF characteristic is a structural property of the centralized paradigm.
+Gossip SGD's peer-pruning mechanism requires no external coordination and degrades gracefully. Downpour SGD survives worker crashes but has no recovery path when its single-process PS is killed.
 
 % ================================================================
 %  VII. LIMITATIONS
@@ -500,9 +492,9 @@ Gossip SGD's peer-pruning mechanism requires no external coordination and degrad
 % ================================================================
 \section{Conclusion}
 
-This paper presented a controlled systems-level empirical comparison of Downpour SGD (Parameter Server) and Gossip SGD (Peer-to-Peer) across optimizer fairness, latency/bandwidth constraints, exchange frequency, communication concentration ($CCR$), and live fault injection.
+This paper presented a controlled systems-level empirical comparison of Downpour SGD (Parameter Server) and Gossip SGD (Peer-to-Peer) across optimizer fairness, latency/bandwidth constraints, exchange frequency, communication concentration ($CCR$), and symmetric fault injection.
 
-Principal findings: Under our evaluated configuration, Downpour SGD trains faster with lower network overhead under unconstrained local conditions. However, as network latency increases to $100$\,ms, Decentralized Gossip SGD becomes $72.94$\,s faster. Optimizing gossip interval ($\text{gossip\_every}=5$) cuts network payload by $80\%$ and delivers $57.45\%$ parallel efficiency at $N=4$ workers.
+Principal findings: Under our evaluated configuration, Downpour SGD trains faster with lower network overhead under unconstrained local conditions. However, under simulated network latency of $100$\,ms, Decentralized Gossip SGD completed execution in $132.17$\,s vs.\ $205.11$\,s for Downpour SGD. Optimizing gossip interval ($\text{gossip\_every}=5$) cuts network payload by $80\%$ and delivers $57.45\%$ parallel efficiency at $N=4$ workers.
 
 % ================================================================
 %  IX. FUTURE WORK

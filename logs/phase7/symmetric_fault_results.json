@@ -1,0 +1,81 @@
+{
+  "downpour_worker_crash": {
+    "worker_0": [
+      {
+        "epoch": 1,
+        "loss": 1.9262991650351162,
+        "accuracy": 29.713188527541103,
+        "epoch_time": 51.807634592056274,
+        "total_elapsed": 51.807634592056274,
+        "global_batch": 261,
+        "bytes_sent": 612111555,
+        "bytes_recv": 612120827,
+        "total_bytes": 1224232382,
+        "throughput_samples_per_sec": 321.6900391463813
+      },
+      {
+        "epoch": 2,
+        "loss": 1.5419429476690476,
+        "accuracy": 43.57374294971799,
+        "epoch_time": 45.45880699157715,
+        "total_elapsed": 97.26644158363342,
+        "global_batch": 522,
+        "bytes_sent": 1224223110,
+        "bytes_recv": 1224241798,
+        "total_bytes": 2448464908,
+        "throughput_samples_per_sec": 366.6176281988211
+      },
+      {
+        "epoch": 3,
+        "loss": 1.43809940714489,
+        "accuracy": 47.12588503540142,
+        "epoch_time": 37.355454206466675,
+        "total_elapsed": 134.6218957901001,
+        "global_batch": 783,
+        "bytes_sent": 1836334665,
+        "bytes_recv": 1836363010,
+        "total_bytes": 3672697675,
+        "throughput_samples_per_sec": 446.146362131903
+      }
+    ],
+    "worker_2": [
+      {
+        "epoch": 1,
+        "loss": 1.9275902363532347,
+        "accuracy": 29.90160787137029,
+        "epoch_time": 52.98117017745972,
+        "total_elapsed": 52.98117017745972,
+        "global_batch": 261,
+        "bytes_sent": 612112599,
+        "bytes_recv": 612120834,
+        "total_bytes": 1224233433,
+        "throughput_samples_per_sec": 314.6023378526891
+      },
+      {
+        "epoch": 2,
+        "loss": 1.545374561086925,
+        "accuracy": 43.190544756419484,
+        "epoch_time": 44.920780658721924,
+        "total_elapsed": 97.90195083618164,
+        "global_batch": 522,
+        "bytes_sent": 1224225198,
+        "bytes_recv": 1224241810,
+        "total_bytes": 2448467008,
+        "throughput_samples_per_sec": 371.0532131360834
+      },
+      {
+        "epoch": 3,
+        "loss": 1.4355262883321536,
+        "accuracy": 47.36621070314375,
+        "epoch_time": 37.85711717605591,
+        "total_elapsed": 135.75906801223755,
+        "global_batch": 783,
+        "bytes_sent": 1836337797,
+        "bytes_recv": 1836363022,
+        "total_bytes": 3672700819,
+        "throughput_samples_per_sec": 440.2870911296509
+      }
+    ]
+  },
+  "gossip_worker_crash": {}
+}
